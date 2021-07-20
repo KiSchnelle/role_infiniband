@@ -1,0 +1,30 @@
+---
+# tasks file for role_infiniband
+- name: Install dependencies.
+  ansible.builtin.apt:
+    name:
+      - "rdma-core"
+      - "libibmad5"
+      - "opensm"
+      - "ibutils"
+      - "infiniband-diags"
+      - "perftest"
+      - "mstflint"
+    state: present
+    update_cache: true
+
+
+- name: 
+  community.general.modprobe:
+    name:
+      - mlx4_en
+      - mlx4_ib
+      - mlx5_core
+    state: present
+
+# Mellanox modules for ConnectX®-2/ConnectX®-3/ConnectX®-3 Pro are:
+#  mlx4_en, mlx4_core, mlx4_ib
+# Mellanox modules for ConnectX®-4/ConnectX®-4 Lx/ConnectX®-5 are:
+#  mlx5_core, mlx5_ib
+# In order to unload the driver, you need to first unload mlx*_en/ mlx*_ib and then the
+# mlx*_core module.
