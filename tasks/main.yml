@@ -14,7 +14,7 @@
     update_cache: true
 
 
-- name: 
+- name: Start modules.
   community.general.modprobe:
     name:
       - mlx4_en
