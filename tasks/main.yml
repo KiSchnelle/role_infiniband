@@ -21,6 +21,7 @@
       - mlx4_ib
       - mlx4_core
     state: present
+  ignore_errors: true
 
 # Mellanox modules for ConnectX®-2/ConnectX®-3/ConnectX®-3 Pro are:
 #  mlx4_en, mlx4_core, mlx4_ib
