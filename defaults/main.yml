@@ -1,2 +1,6 @@
 ---
 # defaults file for role_infiniband
+managed_switch: false
+manager: true
+ib_ip: 192.168.124.2/22
+ib_nameserver: 192.168.124.1

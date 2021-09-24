@@ -7,6 +7,7 @@
       - "libibmad5"
       - "opensm"
       - "ibutils"
+      - "ibverbs-utils"
       - "infiniband-diags"
       - "perftest"
       - "mstflint"
@@ -14,14 +15,15 @@
     update_cache: true
 
 
-- name: Start modules.
-  community.general.modprobe:
-    name:
-      - mlx4_en
-      - mlx4_ib
-      - mlx4_core
-    state: present
-  ignore_errors: true
+# detect if connect x3 or newer, newer is mlx5
+# - name: Start modules.
+#   community.general.modprobe:
+#     name:
+#       - mlx4_en
+#       - mlx4_ib
+#       - mlx4_core
+#     state: present
+#   ignore_errors: true
 
 # Mellanox modules for ConnectX®-2/ConnectX®-3/ConnectX®-3 Pro are:
 #  mlx4_en, mlx4_core, mlx4_ib
@@ -29,3 +31,21 @@
 #  mlx5_core, mlx5_ib
 # In order to unload the driver, you need to first unload mlx*_en/ mlx*_ib and then the
 # mlx*_core module.
+
+# permissions for /dev/infiniband/umad0 to 666?
+- name: Configure netplan.
+  block:
+    - name: Get infiniband interace name.
+      ansible.builtin.shell: "ip a | grep ib | head -n 1|"
+      register: infiniband_interface
+
+    - name: Edit /etc/netplan/50-maas.yml
+      ansible.builtin.blockinfile:
+        path: /etc/netplan/50-maas.yml
+        block: |
+              {{ infiniband_interface.split(":")[0] }}:
+                addresses:
+                  - {{ ib_ip }}
+
+    - name: Apply netplan.
+      ansible.builtin.shell: netplan apply

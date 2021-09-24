@@ -1,0 +1,32 @@
+---
+- name: Install Infiniband support, infiniband-diags, perftest and gperf
+  ansible.builtin.yum:
+    name:
+      - "Infiniband Support"
+      - "compat-dapl"
+      - "infiniband-diags"
+      - "libibcommon"
+      - "mstflint"
+      - "opensm"
+      - "perftest"
+      - "gperf"
+      - "srptools"
+    state: present
+    update_cache: true
+
+
+- name: Start and enable rdma service.
+  ansible.builtin.systemd:
+    name: rdma
+    state: started
+    enabled: true
+
+
+- name: Start opemsm service and enable it.
+  ansible.builtin.systemd:
+    name: opensm
+    state: started
+    enabled: true
+  when: not managed_switch and manager
+
+
