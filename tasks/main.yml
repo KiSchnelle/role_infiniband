@@ -36,7 +36,8 @@
 - name: Configure netplan.
   block:
     - name: Get infiniband interace name.
-      ansible.builtin.shell: "ip a | grep ib | head -n 1|"
+      ansible.builtin.shell: 
+        cmd: ip a | grep ib | head -n 1
       register: infiniband_interface
 
     - name: Edit /etc/netplan/50-maas.yml
@@ -48,4 +49,5 @@
                   - {{ ib_ip }}
 
     - name: Apply netplan.
-      ansible.builtin.shell: netplan apply
+      ansible.builtin.shell:
+        cmd: netplan apply
