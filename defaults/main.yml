@@ -2,5 +2,7 @@
 # defaults file for role_infiniband
 managed_switch: false
 manager: true
-ib_ip: 192.168.124.2/22
+# manages how ipoib ip is calculated, will take normal eth ip f.e 192.168.120.2 it will make 192.166.124.2 with 4
+ip_add: 4
+ip_subnet: 22
 ib_nameserver: 192.168.124.1
