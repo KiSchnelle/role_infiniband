@@ -47,8 +47,8 @@
               {{ infiniband_interface.stdout.split(":")[1] | trim }}:
                 addresses:
                 - {{ ansible_default_ipv4.address.split(".")[0] }}.{{ ansible_default_ipv4.address.split(".")[1] }}.{{ ansible_default_ipv4.address.split(".")[2] | int + ip_add }}.{{ ansible_default_ipv4.address.split(".")[3] }}/{{ ip_subnet | string }}
-              nameservers:
-                addresses: [{{ ib_nameserver | string }}]
+                nameservers:
+                  addresses: [{{ ib_nameserver | string }}]
 
     - name: Apply netplan.
       ansible.builtin.shell:
