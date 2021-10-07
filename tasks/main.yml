@@ -14,7 +14,6 @@
     state: present
     update_cache: true
 
-
 # detect if connect x3 or newer, newer is mlx5
 # - name: Start modules.
 #   community.general.modprobe:
@@ -36,7 +35,7 @@
 - name: Configure netplan.
   block:
     - name: Get infiniband interace name.
-      ansible.builtin.shell: 
+      ansible.builtin.shell:
         cmd: ip a | grep ib | head -n 1
       register: infiniband_interface
 
@@ -47,8 +46,9 @@
               {{ infiniband_interface.stdout.split(":")[1] | trim }}:
                 addresses:
                 - {{ ansible_default_ipv4.address.split(".")[0] }}.{{ ansible_default_ipv4.address.split(".")[1] }}.{{ ansible_default_ipv4.address.split(".")[2] | int + ip_add }}.{{ ansible_default_ipv4.address.split(".")[3] }}/{{ ip_subnet | string }}
-                nameservers:
-                  addresses: [{{ ib_nameserver | string }}]
+                routes:
+                - to: {{ route_target }}
+                  via {{ route_connector }}
 
     - name: Apply netplan.
       ansible.builtin.shell:

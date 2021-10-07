@@ -3,4 +3,5 @@
 # manages how ipoib ip is calculated, will take normal eth ip f.e 192.168.120.2 it will make 192.166.124.2 with 4
 ip_add: 4
 ip_subnet: 22
-ib_nameserver: 192.168.124.1
+route_target: 176.20.16.0/22
+route_connector: 192.168.124.1
