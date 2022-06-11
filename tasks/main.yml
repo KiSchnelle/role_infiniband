@@ -31,13 +31,14 @@
       - swig
       - make
       - m4
-      - dpatch
+      - dpatchib
       - automake
       - dkms
       - libltdl-dev
     state: present
     update_cache: true
   when: ib_installed is failed
+  retries: 3
 
 - name: Download infiniband driver.
   ansible.builtin.get_url:
@@ -67,15 +68,6 @@
     msg: "{{ openib_output.stdout_lines }}"
   when: ib_installed is failed
 
-- name: Get iblinkinfo.
-  ansible.builtin.shell:
-    cmd: iblinkinfo
-  register: ib_out
-
-- name: Print iblinkinfoi output.
-  ansible.builtin.debug:
-    msg: "{{ ib_out.stdout_lines }}"
-
 # permissions for /dev/infiniband/umad0 to 666?
 - name: Configure netplan.
   block:
@@ -86,7 +78,7 @@
 
     - name: Edit /etc/netplan/50-maas.yaml
       ansible.builtin.blockinfile:
-        instertbefore: "version: 2"
+        insertbefore: "version: 2"
         path: /etc/netplan/50-maas.yaml
         block: |2
               {{ infiniband_interface.stdout.split(":")[1] | trim }}:
@@ -97,6 +89,15 @@
     - name: Apply netplan.
       ansible.builtin.shell:
         cmd: netplan apply
+
+- name: Get iblinkinfo.
+  ansible.builtin.shell:
+    cmd: iblinkinfo
+  register: ib_out
+
+- name: Print iblinkinfoi output.
+  ansible.builtin.debug:
+    msg: "{{ ib_out.stdout_lines }}"
 
 - name: Get ip a.
   ansible.builtin.shell:
