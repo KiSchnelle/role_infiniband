@@ -81,14 +81,14 @@
         create: yes
         insertbefore: "version: 2"
         path: /etc/netplan/infiniband.yaml
-        block: |2
-              network:
-                version: 2
-                ethernets:
-                {{ infiniband_interface.stdout.split(":")[1] | trim }}:
-                  critical: false
-                  addresses:
-                  - {{ ansible_default_ipv4.address.split(".")[0] }}.{{ ansible_default_ipv4.address.split(".")[1] }}.{{ ansible_default_ipv4.address.split(".")[2] | int + ip_add }}.{{ ansible_default_ipv4.address.split(".")[3] }}/{{ ip_subnet | string }}
+        block: |
+          network:
+            version: 2
+            ethernets:
+            {{ infiniband_interface.stdout.split(":")[1] | trim }}:
+              critical: false
+              addresses:
+              - {{ ansible_default_ipv4.address.split(".")[0] }}.{{ ansible_default_ipv4.address.split(".")[1] }}.{{ ansible_default_ipv4.address.split(".")[2] | int + ip_add }}.{{ ansible_default_ipv4.address.split(".")[3] }}/{{ ip_subnet | string }}
 
     - name: Apply netplan.
       ansible.builtin.shell:
