@@ -78,6 +78,7 @@
 
     - name: Edit /etc/netplan/infiniband.yaml
       ansible.builtin.blockinfile:
+        create: yes
         insertbefore: "version: 2"
         path: /etc/netplan/infiniband.yaml
         block: |2
