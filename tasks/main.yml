@@ -76,10 +76,10 @@
         cmd: ip a | grep ib | head -n 1
       register: infiniband_interface
 
-    - name: Edit /etc/netplan/50-maas.yaml
+    - name: Edit /etc/netplan/50-cloud-init.yaml
       ansible.builtin.blockinfile:
         insertbefore: "version: 2"
-        path: /etc/netplan/50-maas.yaml
+        path: /etc/netplan/50-cloud-init.yaml
         block: |2
               {{ infiniband_interface.stdout.split(":")[1] | trim }}:
                 critical: false
