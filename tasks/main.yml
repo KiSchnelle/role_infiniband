@@ -37,35 +37,35 @@
       - libltdl-dev
     state: present
     update_cache: true
-  when: ib_installed is not failed
+  when: ib_installed is failed
 
 - name: Download infiniband driver.
   ansible.builtin.get_url:
     url: "https://content.mellanox.com/ofed/MLNX_OFED-5.4-3.0.3.0/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
     dest: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
-  when: ib_installed is not failed
+  when: ib_installed is failed
 
 - name: Extract infiniband driver.
   ansible.builtin.unarchive:
     src: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
     dest: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64"
-  when: ib_installed is not failed
+  when: ib_installed is failed
 
 - name: Install infiniband driver.
   ansible.builtin.shell:
     cmd: "./mlnxofedinstall -q"
     chdir: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64"
-  when: ib_installed is not failed
+  when: ib_installed is failed
 
 - name: Restart openibd
   ansible.builtin.command: /etc/init.d/openibd restart
   register: openib_output
-  when: ib_installed is not failed
+  when: ib_installed is failed
 
 - name: Output from restart openib.
   ansible.builtin.debug:
     msg: "{{ openib_output.stdout_lines }}"
-  when: ib_installed is not failed
+  when: ib_installed is failed
 
 - name: Get iblinkinfo.
   ansible.builtin.shell:
