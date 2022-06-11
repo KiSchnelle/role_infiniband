@@ -1,35 +1,80 @@
 ---
 # tasks file for role_infiniband
+- name: Check if iblinkinfo is available.
+  ansible.builtin.shell:
+    cmd: iblinkinfo
+  register: ib_installed
+  ignore_errors: true
+  changed_when: false
+
 - name: Install dependencies.
   ansible.builtin.apt:
     name:
-      - "rdma-core"
-      - "libibmad5"
-      - "opensm"
-      - "ibutils"
-      - "ibverbs-utils"
-      - "infiniband-diags"
-      - "perftest"
-      - "mstflint"
+      - debhelper
+      - libgfortran4
+      - libnl-route-3-dev
+      - libnl-route-3-dev
+      - libnl-3-dev
+      - gfortran
+      - graphviz
+      - quilt
+      - autoconf
+      - bison
+      - gcc
+      - tcl
+      - autotools-dev
+      - flex
+      - chrpath
+      - pkg-config
+      - libnl-route-3-200
+      - tk
+      - swig
+      - make
+      - m4
+      - dpatch
+      - automake
+      - dkms
+      - libltdl-dev
     state: present
     update_cache: true
+  when: ib_installed is not failed
 
-# detect if connect x3 or newer, newer is mlx5
-# - name: Start modules.
-#   community.general.modprobe:
-#     name:
-#       - mlx4_en
-#       - mlx4_ib
-#       - mlx4_core
-#     state: present
-#   ignore_errors: true
+- name: Download infiniband driver.
+  ansible.builtin.get_url:
+    url: "https://content.mellanox.com/ofed/MLNX_OFED-5.4-3.0.3.0/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
+    dest: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
+  when: ib_installed is not failed
 
-# Mellanox modules for ConnectX®-2/ConnectX®-3/ConnectX®-3 Pro are:
-#  mlx4_en, mlx4_core, mlx4_ib
-# Mellanox modules for ConnectX®-4/ConnectX®-4 Lx/ConnectX®-5 are:
-#  mlx5_core, mlx5_ib
-# In order to unload the driver, you need to first unload mlx*_en/ mlx*_ib and then the
-# mlx*_core module.
+- name: Extract infiniband driver.
+  ansible.builtin.unarchive:
+    src: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
+    dest: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64"
+  when: ib_installed is not failed
+
+- name: Install infiniband driver.
+  ansible.builtin.shell:
+    cmd: "./mlnxofedinstall -q"
+    chdir: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64"
+  when: ib_installed is not failed
+
+- name: Restart openibd
+  ansible.builtin.command: /etc/init.d/openibd restart
+  register: openib_output
+  when: ib_installed is not failed
+
+- name: Output from restart openib.
+  ansible.builtin.debug:
+    msg: "{{ openib_output.stdout_lines }}"
+  when: ib_installed is not failed
+
+- name: Get iblinkinfo.
+  ansible.builtin.shell:
+    cmd: iblinkinfo
+  register: ib_out
+
+- name: Print iblinkinfoi output.
+  ansible.builtin.debug:
+    msg: "{{ ib_out.stdout_lines }}"
 
 # permissions for /dev/infiniband/umad0 to 666?
 - name: Configure netplan.
@@ -41,15 +86,23 @@
 
     - name: Edit /etc/netplan/50-maas.yaml
       ansible.builtin.blockinfile:
+        instertbefore: "version: 2"
         path: /etc/netplan/50-maas.yaml
         block: |2
               {{ infiniband_interface.stdout.split(":")[1] | trim }}:
+                critical: false
                 addresses:
                 - {{ ansible_default_ipv4.address.split(".")[0] }}.{{ ansible_default_ipv4.address.split(".")[1] }}.{{ ansible_default_ipv4.address.split(".")[2] | int + ip_add }}.{{ ansible_default_ipv4.address.split(".")[3] }}/{{ ip_subnet | string }}
-                routes:
-                - to: {{ route_target }}
-                  via: {{ route_connector }}
 
     - name: Apply netplan.
       ansible.builtin.shell:
         cmd: netplan apply
+
+- name: Get ip a.
+  ansible.builtin.shell:
+    cmd: ip a
+  register: ip_out
+
+- name: Print iblinkinfoi output.
+  ansible.builtin.debug:
+    msg: "{{ ip_out.stdout_lines }}"
