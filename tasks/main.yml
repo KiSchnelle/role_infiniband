@@ -48,7 +48,7 @@
 - name: Extract infiniband driver.
   ansible.builtin.unarchive:
     src: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
-    dest: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64"
+    dest: "/root/"
   when: ib_installed is failed
 
 - name: Install infiniband driver.
