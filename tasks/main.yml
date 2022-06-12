@@ -31,7 +31,7 @@
       - swig
       - make
       - m4
-      - dpatchib
+      - dpatch
       - automake
       - dkms
       - libltdl-dev
