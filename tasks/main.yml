@@ -42,21 +42,21 @@
 
 - name: Download infiniband driver.
   ansible.builtin.get_url:
-    url: "https://content.mellanox.com/ofed/MLNX_OFED-5.4-3.0.3.0/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
-    dest: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
+    url: "https://content.mellanox.com/ofed/MLNX_OFED-5.8-2.0.3.0/MLNX_OFED_LINUX-5.8-2.0.3.0-ubuntu22.04-x86_64.tgz"
+    dest: "/root/MLNX_OFED_LINUX-5.8-2.0.3.0-ubuntu22.04-x86_64.tgz"
   when: ib_installed is failed
   retries: 3
 
 - name: Extract infiniband driver.
   ansible.builtin.unarchive:
-    src: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64.tgz"
+    src: "/root/MLNX_OFED_LINUX-5.8-2.0.3.0-ubuntu22.04-x86_64.tgz"
     dest: "/root/"
   when: ib_installed is failed
 
 - name: Install infiniband driver.
   ansible.builtin.shell:
     cmd: "./mlnxofedinstall -q"
-    chdir: "/root/MLNX_OFED_LINUX-5.4-3.0.3.0-ubuntu20.04-x86_64"
+    chdir: "/root/MLNX_OFED_LINUX-5.8-2.0.3.0-ubuntu22.04-x86_64.tgz"
   when: ib_installed is failed
 
 - name: Restart openibd
